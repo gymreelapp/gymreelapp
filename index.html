@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0e1e" />
+    <title>Gym Reel — Log workouts. Track progress. Share with friends.</title>
+    <meta
+      name="description"
+      content="Gym Reel is a fitness app to log your workouts, track your progress over time, and share your training with friends."
+    />
+    <meta property="og:title" content="Gym Reel" />
+    <meta
+      property="og:description"
+      content="Log your workouts, track your progress and share it with your friends."
+    />
+    <meta property="og:type" content="website" />
+
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: "#eef5ff",
+                100: "#d9e8ff",
+                200: "#bcd6ff",
+                300: "#8ebbff",
+                400: "#5993ff",
+                500: "#3b71ff",
+                600: "#2451f5",
+                700: "#1d3fd9",
+                800: "#1d36ad",
+                900: "#1d3388",
+                950: "#141f4f",
+              },
+            },
+            fontFamily: {
+              sans: [
+                "InterVariable",
+                "Inter",
+                "ui-sans-serif",
+                "system-ui",
+                "-apple-system",
+                "Segoe UI",
+                "Roboto",
+                "sans-serif",
+              ],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        --bg: 255 255 255;
+        --fg: 10 14 30;
+        --muted: 244 247 253;
+        --muted-fg: 90 100 130;
+        --border: 226 232 248;
+      }
+      html.dark {
+        --bg: 7 10 22;
+        --fg: 235 240 255;
+        --muted: 14 19 38;
+        --muted-fg: 150 160 190;
+        --border: 30 38 70;
+      }
+      html,
+      body {
+        background-color: rgb(var(--bg));
+        color: rgb(var(--fg));
+      }
+      body {
+        font-family:
+          "InterVariable", "Inter", ui-sans-serif, system-ui, -apple-system,
+          "Segoe UI", Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        font-feature-settings: "ss01", "cv11";
+      }
+
+      /* Subtle hero glow */
+      .hero-glow {
+        background:
+          radial-gradient(
+            ellipse 60% 50% at 50% -10%,
+            rgba(59, 113, 255, 0.35),
+            transparent 60%
+          );
+      }
+      html.dark .hero-glow {
+        background:
+          radial-gradient(
+            ellipse 70% 50% at 50% -10%,
+            rgba(59, 113, 255, 0.45),
+            transparent 60%
+          );
+      }
+
+      /* Light grid */
+      .bg-grid {
+        background-image:
+          linear-gradient(
+            to right,
+            rgba(120, 140, 200, 0.08) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(120, 140, 200, 0.08) 1px,
+            transparent 1px
+          );
+        background-size: 48px 48px;
+      }
+      html.dark .bg-grid {
+        background-image:
+          linear-gradient(
+            to right,
+            rgba(140, 160, 230, 0.06) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(140, 160, 230, 0.06) 1px,
+            transparent 1px
+          );
+      }
+
+      /* Reveal-on-scroll */
+      .reveal {
+        opacity: 0;
+        transform: translateY(12px);
+        transition:
+          opacity 0.7s ease-out,
+          transform 0.7s ease-out;
+      }
+      .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Embla */
+      .embla {
+        overflow: hidden;
+      }
+      .embla__container {
+        display: flex;
+        touch-action: pan-y;
+      }
+      .embla__slide {
+        flex: 0 0 100%;
+        min-width: 0;
+        height: 100%;
+        position: relative;
+      }
+      /* Embla inside a phone screen — fills the screen */
+      .phone__screen .embla,
+      .phone__screen .embla__container {
+        height: 100%;
+        width: 100%;
+      }
+      .phone__screen .embla {
+        cursor: grab;
+      }
+      .phone__screen .embla:active {
+        cursor: grabbing;
+      }
+
+      /* Phone frame placeholder */
+      .phone {
+        position: relative;
+        aspect-ratio: 9 / 19.5;
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+        border-radius: 2.25rem;
+        background:
+          linear-gradient(
+            180deg,
+            rgba(30, 40, 80, 0.9),
+            rgba(10, 14, 30, 0.95)
+          );
+        padding: 8px;
+        box-shadow:
+          0 30px 60px -20px rgba(36, 81, 245, 0.35),
+          0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      }
+      .phone__screen {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        border-radius: 1.75rem;
+        overflow: hidden;
+        background: rgb(var(--muted));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .phone--light .phone__screen {
+        background: #f6f8fc;
+        color: #0a0e1e;
+      }
+      .phone--dark .phone__screen {
+        background: #0a0e1e;
+        color: #ebf0ff;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="antialiased">
+    <!-- Nav -->
+    <header
+      class="sticky top-0 z-40 border-b border-transparent backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-[rgb(7,10,22)]/60"
+      id="site-nav"
+    >
+      <div
+        class="mx-auto flex h-16 max-w-6xl items-center px-5"
+      >
+        <a href="#top" class="flex items-center gap-2 font-semibold tracking-tight">
+          <span
+            class="grid h-8 w-8 place-items-center rounded-lg bg-white text-brand-600 shadow-lg shadow-brand-600/30"
+            aria-hidden="true"
+          >
+            <img src="logo.png" alt="Gym Reel Logo" class="w-7 h-7 object-contain">
+          </span>
+          <span>Gym Reel</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- Hero -->
+      <section class="relative overflow-hidden">
+        <div class="absolute inset-0 -z-10 bg-grid opacity-60"></div>
+        <div
+          class="absolute inset-x-0 top-0 -z-10 h-[520px] hero-glow"
+          aria-hidden="true"
+        ></div>
+
+        <div class="mx-auto max-w-6xl px-5 pt-20 pb-16 md:pt-28 md:pb-24">
+          <div class="mx-auto max-w-3xl text-center">
+            <p
+              class="reveal mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--border))] bg-[rgb(var(--muted))] px-3 py-1 text-xs font-medium text-[rgb(var(--muted-fg))]"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-brand-500"></span>
+              Coming Soon on iOS.
+            </p>
+            <h1
+              class="reveal text-balance text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
+            >
+              Log your workouts, track your progress and
+              <span
+                class="bg-gradient-to-r from-brand-500 to-brand-700 bg-clip-text text-transparent"
+                >share it with your friends</span
+              >.
+            </h1>
+            <p
+              class="reveal mx-auto mt-6 max-w-2xl text-pretty text-lg text-[rgb(var(--muted-fg))]"
+            >
+              Gym Reel turns every session into a record worth keeping. A
+              focused logger, a clean progress timeline, and a feed that
+              actually motivates the people you train with.
+            </p>
+            <div
+              class="reveal mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
+            >
+              <a
+                href="#download"
+                class="inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-3 text-sm font-medium text-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-700"
+                >Download Gym Reel</a
+              >
+              <a
+                href="#screenshots"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--muted))] px-5 py-3 text-sm font-medium transition hover:bg-brand-50 dark:hover:bg-brand-950"
+              >
+                See it in action
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-4 w-4"
+                ><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Hero phones -->
+          <div class="reveal mt-16">
+            <!-- Mobile: single phone -->
+            <div class="md:hidden max-w-[260px] mx-auto">
+              <div class="phone phone--dark" role="img" aria-label="Gym Reel app preview">
+                <div class="phone__screen">
+                  <img src="feed.png" alt="Gym Reel social feed" class="w-full h-full object-cover object-top">
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop: 3 floating phones -->
+            <div class="hidden md:flex items-end justify-center" style="height:620px; overflow:visible;">
+              <!-- Left: Workout start -->
+              <div style="width:210px; flex-shrink:0; transform:rotate(-8deg) translateY(28px); opacity:0.7; filter:blur(0.3px); margin-right:-26px;">
+                <div class="phone phone--dark" style="max-width:210px;">
+                  <div class="phone__screen">
+                    <img src="Workout.png" alt="Start a workout" class="w-full h-full object-cover object-top">
+                  </div>
+                </div>
+              </div>
+              <!-- Centre: Feed (star of the show) -->
+              <div style="width:275px; flex-shrink:0; position:relative; z-index:10;">
+                <div class="phone phone--dark" style="max-width:275px;" role="img" aria-label="Gym Reel social feed">
+                  <div class="phone__screen">
+                    <img src="feed.png" alt="Gym Reel social feed" class="w-full h-full object-cover object-top">
+                  </div>
+                </div>
+              </div>
+              <!-- Right: Workout details -->
+              <div style="width:210px; flex-shrink:0; transform:rotate(8deg) translateY(28px); opacity:0.7; filter:blur(0.3px); margin-left:-26px;">
+                <div class="phone phone--light" style="max-width:210px;">
+                  <div class="phone__screen">
+                    <img src="Feed_workout_details.PNG" alt="Workout details" class="w-full h-full object-cover object-top">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section id="features" class="border-t border-[rgb(var(--border))]">
+        <div class="mx-auto max-w-6xl px-5 py-20 md:py-28">
+          <div class="reveal mx-auto max-w-2xl text-center">
+            <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Log it. Track it. Share it.
+            </h2>
+            <p class="mt-4 text-[rgb(var(--muted-fg))]">
+              Three focused features, built around the way you actually train.
+            </p>
+          </div>
+
+          <div class="mt-14 grid gap-6 md:grid-cols-3">
+            <!-- card -->
+            <div class="reveal group rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--muted))] p-6 transition hover:-translate-y-0.5 hover:border-brand-300 dark:hover:border-brand-700">
+              <div class="grid h-10 w-10 place-items-center rounded-lg bg-brand-600 text-white shadow-md shadow-brand-600/30">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+              </div>
+              <h3 class="mt-5 text-lg font-semibold">Log every session</h3>
+              <p class="mt-2 text-sm text-[rgb(var(--muted-fg))]">
+                Pick a template or start from scratch. Sets, reps, and weight auto-fill from your last session so you can focus on lifting. Personal bests are flagged the moment you log them.
+              </p>
+            </div>
+
+            <div class="reveal group rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--muted))] p-6 transition hover:-translate-y-0.5 hover:border-brand-300 dark:hover:border-brand-700">
+              <div class="grid h-10 w-10 place-items-center rounded-lg bg-brand-600 text-white shadow-md shadow-brand-600/30">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg>
+              </div>
+              <h3 class="mt-5 text-lg font-semibold">Review your history</h3>
+              <p class="mt-2 text-sm text-[rgb(var(--muted-fg))]">
+                Every personal best is flagged automatically the moment you log it. Your full workout history lives on your profile so you always know what you've done.
+              </p>
+            </div>
+
+            <div class="reveal group rounded-2xl border border-[rgb(var(--border))] bg-[rgb(var(--muted))] p-6 transition hover:-translate-y-0.5 hover:border-brand-300 dark:hover:border-brand-700">
+              <div class="grid h-10 w-10 place-items-center rounded-lg bg-brand-600 text-white shadow-md shadow-brand-600/30">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></svg>
+              </div>
+              <h3 class="mt-5 text-lg font-semibold">Share your training</h3>
+              <p class="mt-2 text-sm text-[rgb(var(--muted-fg))]">
+                Post workouts — with or without a photo. See what your friends are lifting, leave reactions, and jump straight into any workout you spot on the feed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screenshots / swipe -->
+      <section id="screenshots" class="border-t border-[rgb(var(--border))] bg-[rgb(var(--muted))]/40">
+        <div class="mx-auto max-w-6xl px-5 py-20 md:py-28">
+          <div class="reveal mx-auto max-w-2xl text-center">
+            <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Your feed. Your posts. Your workouts.
+            </h2>
+            <p class="mt-4 text-[rgb(var(--muted-fg))]">
+              Swipe through the app — or tap the dots below.
+            </p>
+          </div>
+
+        <div class="reveal mt-12 flex flex-col items-center">
+          <div class="phone phone--dark">
+            <div class="phone__screen">
+              <div
+                class="embla"
+                id="embla"
+                tabindex="0"
+                aria-roledescription="carousel"
+                aria-label="Post and workout screens"
+              >
+                <div class="embla__container">
+<!-- Slide 1: Feed -->
+                    <div class="embla__slide" aria-label="Feed screen">
+                      <div class="h-full w-full p-0 m-0">
+                        <img src="feed.png" alt="Social feed" class="h-full w-full object-cover object-top block">
+                      </div>
+                    </div>
+<!-- Slide 2: Workout details -->
+                    <div class="embla__slide" aria-label="Workout details screen">
+                      <div class="h-full w-full p-0 m-0">
+                        <img src="Feed_workout_details.PNG" alt="Workout details" class="h-full w-full object-cover object-top block">
+                      </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+            <!-- Dots -->
+            <div class="mt-6 flex items-center gap-2" id="embla-dots" role="tablist" aria-label="Choose screen">
+              <button type="button" class="embla__dot h-2.5 w-2.5 rounded-full bg-[rgb(var(--border))] transition" aria-label="Show feed"></button>
+              <button type="button" class="embla__dot h-2.5 w-2.5 rounded-full bg-[rgb(var(--border))] transition" aria-label="Show workout details"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Themes -->
+      <section id="themes" class="border-t border-[rgb(var(--border))]">
+        <div class="mx-auto max-w-6xl px-5 py-20 md:py-28">
+          <div class="reveal mx-auto max-w-2xl text-center">
+            <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Polished in light. Sharper in dark.
+            </h2>
+            <p class="mt-4 text-[rgb(var(--muted-fg))]">
+              Both themes are first-class. Pick the one that fits your gym lighting.
+            </p>
+          </div>
+
+          <div class="reveal mt-14 grid items-center gap-10 md:grid-cols-2">
+            <div class="rounded-3xl border border-[rgb(var(--border))] bg-white p-10 shadow-xl shadow-brand-900/5">
+              <div class="phone phone--light">
+                <div class="phone__screen">
+                  <img src="Feed_workout_details.PNG" alt="Workout detail in light mode" class="w-full h-full object-cover object-top">
+                </div>
+              </div>
+              <p class="mt-6 text-center text-xs uppercase tracking-widest text-[rgb(var(--muted-fg))]">Light</p>
+            </div>
+
+            <div class="rounded-3xl border border-brand-900/20 bg-[rgb(7,10,22)] p-10 shadow-xl shadow-brand-900/40">
+              <div class="phone phone--dark">
+                <div class="phone__screen">
+                  <img src="profile_dark.png" alt="Profile in dark mode" class="w-full h-full object-cover object-top">
+                </div>
+              </div>
+              <p class="mt-6 text-center text-xs uppercase tracking-widest text-slate-400">Dark</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section id="download" class="border-t border-[rgb(var(--border))]">
+        <div class="mx-auto max-w-4xl px-5 py-24 text-center md:py-32">
+          <div class="reveal">
+            <h2 class="text-3xl font-semibold tracking-tight sm:text-5xl">
+              Your next session is the one that counts.
+            </h2>
+            <p class="mt-5 text-lg text-[rgb(var(--muted-fg))]">
+              Join the beta and start building the record you wish you'd kept all along.
+            </p>
+            <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <a
+                href="#"
+                class="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true"><path d="M16.365 1.43c.06 1.14-.36 2.247-1.07 3.04-.69.79-1.85 1.41-2.97 1.32-.07-1.13.46-2.27 1.16-3.02.79-.84 2.07-1.46 2.88-1.34zM20.5 17.4c-.6 1.39-1.32 2.77-2.45 4.06-.97 1.1-2.18 2.46-3.69 2.48-1.5.02-1.99-.93-3.7-.92-1.71.01-2.25.94-3.66.93-1.5-.01-2.65-1.21-3.62-2.32C1.4 19.3-.4 14.95 1.18 11.96c.79-1.49 2.21-2.43 3.74-2.46 1.43-.02 2.78.96 3.69.96.91 0 2.55-1.18 4.3-1.01.74.03 2.78.3 4.1 2.25-3.6 1.96-3.04 7.16 1.49 5.7z"/></svg>
+                App Store
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-[rgb(var(--border))]">
+      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-10 text-sm text-[rgb(var(--muted-fg))] md:flex-row">
+        <p>© <span id="year"></span> Gym Reel. All rights reserved.</p>
+        <div class="flex items-center gap-5">
+          <a href="privacy.html#privacy" class="hover:text-[rgb(var(--fg))]">Privacy</a>
+          <a href="privacy.html#terms" class="hover:text-[rgb(var(--fg))]">Terms</a>
+          <a href="mailto:info@gymreelapp.com" class="hover:text-[rgb(var(--fg))]">Contact</a>
+        </div>
+      </div>
+    </footer>
+
+    <script type="module">
+      import EmblaCarousel from "https://esm.sh/embla-carousel@8.3.0";
+
+      // Apply system dark/light preference
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.classList.add("dark");
+      }
+
+      // Footer year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Reveal-on-scroll
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const reveals = document.querySelectorAll(".reveal");
+      if (reduced) {
+        reveals.forEach((el) => el.classList.add("is-visible"));
+      } else if ("IntersectionObserver" in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
+        );
+        reveals.forEach((el) => io.observe(el));
+      } else {
+        reveals.forEach((el) => el.classList.add("is-visible"));
+      }
+
+      // Embla carousel — two slides (post / workout) inside the phone screen
+      const emblaNode = document.getElementById("embla");
+      const embla = EmblaCarousel(emblaNode, {
+        loop: false,
+        align: "start",
+        containScroll: "trimSnaps",
+        skipSnaps: false,
+      });
+
+      const dots = Array.from(document.querySelectorAll("#embla-dots .embla__dot"));
+      const setDots = () => {
+        const i = embla.selectedScrollSnap();
+        dots.forEach((d, idx) => {
+          const active = idx === i;
+          d.setAttribute("aria-selected", active ? "true" : "false");
+          d.classList.toggle("bg-brand-500", active);
+          d.classList.toggle("w-6", active);
+          d.classList.toggle("bg-[rgb(var(--border))]", !active);
+        });
+      };
+      dots.forEach((dot, idx) => dot.addEventListener("click", () => embla.scrollTo(idx)));
+      embla.on("select", setDots);
+      embla.on("reInit", setDots);
+      setDots();
+
+      // Keyboard support: arrow keys when carousel is focused
+      emblaNode.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          embla.scrollPrev();
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          embla.scrollNext();
+        }
+      });
+    </script>
+  </body>
+</html>
